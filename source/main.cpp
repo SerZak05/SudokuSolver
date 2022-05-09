@@ -2,7 +2,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "texture.h"
-#include "button.h"
+#include "button_board.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
@@ -67,21 +67,26 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    Button b(10, 10, 100, 100);
+    ButtonBoard bb(10, 10, 540, 540);
 
     SDL_Event e;
     bool running = true;
     while (running) {
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT)
+            switch (e.type) {
+            case SDL_QUIT:
                 running = false;
-            else {
-                b.handleEvent(&e);
+                break;
+            case SDL_KEYDOWN:
+                // Solve
+                break;
+            default:
+                bb.handleEvent(&e);
             }
         }
         SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
         SDL_RenderClear(renderer);
-        b.render(renderer);
+        bb.render(renderer);
         SDL_RenderPresent(renderer);
     }
 

@@ -24,8 +24,8 @@ public:
     void render(SDL_Renderer* r, int x, int y, int width, int height);
 
     //Gets image dimensions
-    inline int getWidth() { return mWidth; }
-    inline int getHeight() { return mHeight; }
+    inline int getWidth() const { return mWidth; }
+    inline int getHeight() const { return mHeight; }
 
 private:
     //The actual hardware texture

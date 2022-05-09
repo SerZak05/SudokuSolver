@@ -2,9 +2,14 @@
 #include "texture.h"
 #include <iostream>
 
-Button::Button(int x, int y, int width, int height) : mWidth(width), mHeight(height) {
+Button::Button() : mWidth(0), mHeight(0), mCurrentState(BUTTON_MOUSE_OUT) {
     mPosition.x = 0;
     mPosition.y = 0;
+}
+
+Button::Button(int x, int y, int width, int height) : mWidth(width), mHeight(height) {
+    mPosition.x = x;
+    mPosition.y = y;
     mCurrentState = BUTTON_MOUSE_OUT;
 }
 
@@ -48,6 +53,7 @@ void Button::handleEvent(const SDL_Event* e) {
 }
 
 void Button::render(SDL_Renderer* r) {
+    // std::cout << mWidth << std::endl;
     switch (mCurrentState) {
     case BUTTON_MOUSE_OUT:
         SDL_SetRenderDrawColor(r, 230, 230, 230, 255);
@@ -62,7 +68,7 @@ void Button::render(SDL_Renderer* r) {
         SDL_SetRenderDrawColor(r, 255, 0, 0, 255);
     }
 
-    SDL_Rect buttonRect = { mPosition.x, mPosition.y, mPosition.x + mWidth, mPosition.y + mHeight };
+    SDL_Rect buttonRect = { mPosition.x, mPosition.y, mWidth, mHeight };
     SDL_RenderFillRect(r, &buttonRect);
     SDL_RenderDrawRect(r, &buttonRect);
 
