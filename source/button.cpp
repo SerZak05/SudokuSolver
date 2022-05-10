@@ -1,5 +1,6 @@
 #include "button.h"
 #include "texture.h"
+#include "common_textures.h"
 #include <iostream>
 
 Button::Button() : mWidth(0), mHeight(0), mCurrentState(BUTTON_MOUSE_OUT) {
@@ -43,6 +44,7 @@ void Button::handleEvent(const SDL_Event* e) {
 
             case SDL_MOUSEBUTTONUP:
                 mCurrentState = BUTTON_MOUSE_OVER_MOTION;
+                //Updating number
                 mNum++;
                 if (mNum > 9)
                     mNum = 0;
@@ -74,9 +76,7 @@ void Button::render(SDL_Renderer* r) {
 
     //drawing number on top
     if (mNum != 0) {
-        Texture& numberTexture = numberTextures[mNum];
+        Texture& numberTexture = CommonTextures::numbers[mNum];
         numberTexture.render(r, mPosition.x + 5, mPosition.y + 5, mWidth - 10, mHeight - 10);
     }
 }
-
-Texture Button::numberTextures[10] = {};

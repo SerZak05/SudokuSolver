@@ -1,8 +1,9 @@
 #include <iostream>
 #include <SDL.h>
-#include <SDL_image.h>
 #include "texture.h"
 #include "button_board.h"
+#include "board_display.h"
+#include "common_textures.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
@@ -17,11 +18,7 @@ bool init() {
         std::cerr << "SDL_Init failed!" << std::endl;
         return false;
     }
-
-    if (IMG_Init(IMG_INIT_PNG) < 0) {
-        std::cerr << "IMG_Init PNG failed!" << std::endl;
-        return false;
-    }
+    
 
     window = SDL_CreateWindow("Sudoku solver",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -38,14 +35,7 @@ bool init() {
         return false;
     }
 
-    // Initializing textures for numbers on buttons
-    for (int i = 1; i <= 9; ++i) {
-        Button::numberTextures[i] = Texture();
-        std::string path = "numberTextures/number_";
-        path += '0' + i;
-        path += ".png";
-        Button::numberTextures[i].loadFromFile(renderer, path);
-    }
+    CommonTextures::loadTextures(renderer);
 
     return true;
 }
@@ -58,7 +48,6 @@ void close() {
     renderer = NULL;
 
     SDL_Quit();
-    IMG_Quit();
 }
 
 int main(int argc, char* argv[]) {
@@ -68,6 +57,7 @@ int main(int argc, char* argv[]) {
     }
 
     ButtonBoard bb(10, 10, 540, 540);
+    BoardDisplay bd(550, 10, 243, 243);
 
     SDL_Event e;
     bool running = true;
@@ -78,7 +68,10 @@ int main(int argc, char* argv[]) {
                 running = false;
                 break;
             case SDL_KEYDOWN:
-                // Solve
+                // Solve //
+                // SDL_KeyboardEvent keyboardEvent = e.key;
+                // if (e.key.keysym.sym == SDLK_)
+                bd.board = bb.getBoard();
                 break;
             default:
                 bb.handleEvent(&e);
@@ -87,6 +80,7 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
         SDL_RenderClear(renderer);
         bb.render(renderer);
+        bd.render(renderer);
         SDL_RenderPresent(renderer);
     }
 

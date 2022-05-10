@@ -1,6 +1,5 @@
 #pragma once
 #include <SDL.h>
-#include <SDL_image.h>
 #include "texture.h"
 
 enum ButtonState {
@@ -29,9 +28,6 @@ public:
 
     //Returns number displayed on the button (0, if none)
     inline int getNumber() const { return mNum; }
-
-    //Textures for numbers
-    static Texture numberTextures[10];
 private:
     //Top left position
     SDL_Point mPosition;
