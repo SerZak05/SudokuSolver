@@ -45,9 +45,20 @@ void Button::handleEvent(const SDL_Event* e) {
             case SDL_MOUSEBUTTONUP:
                 mCurrentState = BUTTON_MOUSE_OVER_MOTION;
                 //Updating number
-                mNum++;
-                if (mNum > 9)
+                SDL_MouseButtonEvent mouseEvent = e->button;
+                if (mouseEvent.button == SDL_BUTTON_LEFT) {
+                    mNum++;
+                    if (mNum > 9)
+                        mNum = 0;
+                }
+                else if (mouseEvent.button == SDL_BUTTON_RIGHT) {
+                    mNum--;
+                    if (mNum < 0)
+                        mNum = 9;
+                }
+                else if (mouseEvent.button == SDL_BUTTON_MIDDLE) {
                     mNum = 0;
+                }
                 break;
             }
         }

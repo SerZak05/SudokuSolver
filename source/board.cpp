@@ -8,7 +8,7 @@ Board::Board() {
     }
 }
 
-int Board::get(int i, int j) {
+int Board::get(int i, int j) const {
     return board[i][j];
 }
 
@@ -20,6 +20,6 @@ void Board::set(int val, int i, int j) {
     board[i][j] = val;
 }
 
-bool Board::isEmpty(int i, int j) {
+bool Board::isEmpty(int i, int j) const {
     return board[i][j] == 0;
 }

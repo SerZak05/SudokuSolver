@@ -4,6 +4,7 @@
 #include "button_board.h"
 #include "board_display.h"
 #include "common_textures.h"
+#include "solver.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
@@ -57,7 +58,8 @@ int main(int argc, char* argv[]) {
     }
 
     ButtonBoard bb(10, 10, 540, 540);
-    BoardDisplay bd(550, 10, 243, 243);
+    BoardDisplay startBoardDisplay(550, 10, 243, 243);
+    BoardDisplay solutionBoardDisplay(550, 253, 243, 243);
 
     SDL_Event e;
     bool running = true;
@@ -68,10 +70,21 @@ int main(int argc, char* argv[]) {
                 running = false;
                 break;
             case SDL_KEYDOWN:
-                // Solve //
-                // SDL_KeyboardEvent keyboardEvent = e.key;
-                // if (e.key.keysym.sym == SDLK_)
-                bd.board = bb.getBoard();
+                SDL_KeyboardEvent keyboardEvent = e.key;
+                if (e.key.keysym.sym == SDLK_SPACE) {
+                    // Solving
+                    startBoardDisplay.board = bb.getBoard();
+                    Solver solver;
+                    solver.setStartBoard(bb.getBoard());
+                    auto solutions = solver.solve();
+                    if (solutions.empty()) {
+                        std::cout << "No solutions found" << std::endl;
+                        solutionBoardDisplay.board = Board();
+                    }
+                    else {
+                        solutionBoardDisplay.board = solutions.front();
+                    }
+                }
                 break;
             default:
                 bb.handleEvent(&e);
@@ -80,7 +93,8 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
         SDL_RenderClear(renderer);
         bb.render(renderer);
-        bd.render(renderer);
+        startBoardDisplay.render(renderer);
+        solutionBoardDisplay.render(renderer);
         SDL_RenderPresent(renderer);
     }
 
