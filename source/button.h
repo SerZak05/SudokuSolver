@@ -18,6 +18,8 @@ public:
     //Sets top left position
     void setPosition(int x, int y);
 
+    void setNumber(int num);
+
     //Gets top left position
     inline SDL_Point getPosition() const { return mPosition; }
 

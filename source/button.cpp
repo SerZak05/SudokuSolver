@@ -19,6 +19,11 @@ void Button::setPosition(int x, int y) {
     mPosition.y = y;
 }
 
+void Button::setNumber(int num) {
+    if (num >= 0 && num < 10)
+        mNum = num;
+}
+
 void Button::handleEvent(const SDL_Event* e) {
     if (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP) {
         //Get mouse position

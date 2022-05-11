@@ -11,6 +11,8 @@ public:
     //Returns sudoku board that is displayed on buttons
     Board getBoard() const;
 
+    void setNumber(int val, int i, int j);
+
     //Passes events to buttons
     void handleEvent(const SDL_Event*);
     void render(SDL_Renderer* r);

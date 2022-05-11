@@ -24,6 +24,11 @@ Board ButtonBoard::getBoard() const {
     return res;
 }
 
+void ButtonBoard::setNumber(int val, int i, int j) {
+    if (i >= 0 && i < 9 && j >= 0 && j < 9)
+        mButtons[i][j].setNumber(val);
+}
+
 void ButtonBoard::handleEvent(const SDL_Event* e) {
     for (int i = 0; i < 9; ++i) {
         for (int j = 0; j < 9; ++j) {

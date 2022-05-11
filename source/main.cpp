@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL.h>
+#include <fstream>
 #include "texture.h"
 #include "button_board.h"
 #include "board_display.h"
@@ -51,6 +52,31 @@ void close() {
     SDL_Quit();
 }
 
+Board inputBoard(std::string fileName) {
+    std::ifstream input(fileName);
+    Board res;
+    for (int i = 0; i < 9; ++i) {
+        std::string row;
+        std::getline(input, row);
+        if (row.size() != 9) {
+            std::cerr << "Incorrect row size!" << std::endl;
+            std::cerr << "Row " << i + '0' << " size: " << row.size() + '0' << std::endl;
+            return Board();
+        }
+        for (int j = 0; j < 9; ++j) {
+            if (std::isspace(row[j])) continue;
+
+            if (!std::isdigit(row[j])) {
+                std::cerr << "Incorrect input format!" << std::endl;
+                std::cerr << "Found: \'" << row[j] << "\'" << std::endl;
+                return Board();
+            } else
+                res.set(row[j] - '0', i, j);
+        }
+    }
+    return res;
+}
+
 int main(int argc, char* argv[]) {
     if (!init()) {
         std::cerr << "Init failed!" << std::endl;
@@ -60,6 +86,25 @@ int main(int argc, char* argv[]) {
     ButtonBoard bb(10, 10, 540, 540);
     BoardDisplay startBoardDisplay(550, 10, 243, 243);
     BoardDisplay solutionBoardDisplay(550, 253, 243, 243);
+
+    //Additional parameters
+    if (argc > 1) {
+        std::string param(argv[1]);
+        if (param == "--file" || param == "-f") { //File input
+            if (argc > 2) {
+                std::string fileName(argv[2]);
+                Board givenBoard = inputBoard(fileName);
+                //Setting button board accordingly
+                for (int i = 0; i < 9; ++i) {
+                    for (int j = 0; j < 9; ++j) {
+                        bb.setNumber(givenBoard.get(i, j), i, j);
+                    }
+                }
+            }
+        }
+    }
+
+    std::ofstream log("sudoku.log");
 
     SDL_Event e;
     bool running = true;
@@ -77,12 +122,14 @@ int main(int argc, char* argv[]) {
                     Solver solver;
                     solver.setStartBoard(bb.getBoard());
                     auto solutions = solver.solve();
+                    std::cout << "Done!" << std::endl;
                     if (solutions.empty()) {
                         std::cout << "No solutions found" << std::endl;
                         solutionBoardDisplay.board = Board();
                     }
                     else {
                         solutionBoardDisplay.board = solutions.front();
+                        log << solutions.front().toString() << std::endl;
                     }
                 }
                 break;

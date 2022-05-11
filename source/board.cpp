@@ -23,3 +23,17 @@ void Board::set(int val, int i, int j) {
 bool Board::isEmpty(int i, int j) const {
     return board[i][j] == 0;
 }
+
+std::string Board::toString() const {
+    std::string res;
+    for (int i = 0; i < 9; ++i) {
+        for (int j = 0; j < 9; ++j) {
+            if (isEmpty(i, j))
+                res += ' ';
+            else
+                res += get(i, j) + '0';
+        }
+        res += '\n';
+    }
+    return res;
+}
