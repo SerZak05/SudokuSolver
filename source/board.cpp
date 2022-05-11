@@ -28,10 +28,10 @@ std::string Board::toString() const {
     std::string res;
     for (int i = 0; i < 9; ++i) {
         for (int j = 0; j < 9; ++j) {
-            if (isEmpty(i, j))
+            if (isEmpty(j, i))
                 res += ' ';
             else
-                res += get(i, j) + '0';
+                res += get(j, i) + '0';
         }
         res += '\n';
     }

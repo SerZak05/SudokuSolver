@@ -15,13 +15,21 @@ void Solver::setStartBoard(const Board& b) {
     startBoard = b;
 }
 
-std::vector<Board> Solver::solve() {
+std::vector<Board> Solver::solve(std::ostream& log) {
+    if (logging)
+        log << "===Begging solving...===" << std::endl;
     std::vector<Board> res;
-    solve(startBoard, res);
+    solve(startBoard, res, log);
+    if (logging) {
+        log << "===Stopped solving===" << std::endl;
+        log << "In total " << res.size() << " solutions were found." << std::endl;
+    }
     return res;
 }
 
-void Solver::solve(const Board& b, std::vector<Board>& solutions) {
+void Solver::solve(const Board& b, std::vector<Board>& solutions, std::ostream& log) {
+    if (logging)
+        log << "Solving board:\n" << b.toString() << std::endl;
     //Map of rows, columns and 3x3 squares mached with a set of numbers NOT in it
     std::set<int> rows[9], cols[9], squares[9];
     //Initiallizing sets
@@ -51,12 +59,16 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
             int num = b.get(i, j);
             if (rows[i].find(num) == rows[i].end()) {
                 //We already found this number in this row!
+                if (logging)
+                    log << "Number " << num << " is already in row " << i << std::endl;
                 return;
             }
             rows[i].erase(num);
 
             if (cols[j].find(num) == cols[j].end()) {
                 //We already found this number in this column!
+                if (logging)
+                    log << "Number " << num << " is already in column " << j << std::endl;
                 return;
             }
             cols[j].erase(num);
@@ -64,6 +76,8 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
             int sqInd = getSquareIndex(i, j);
             if (squares[sqInd].find(num) == squares[sqInd].end()) {
                 //We already found this number in this square!
+                if (logging)
+                    log << "Number " << num << " is already in square " << sqInd << std::endl;
                 return;
             }
             squares[sqInd].erase(num);
@@ -102,6 +116,8 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
             if (min_row.first == 0) {
                 //Forgetting about full rows
                 rows_ord.erase(min_row);
+                if (logging)
+                    log << "Row " << min_row.second << " is full." << std::endl;
             }
             else {
                 int i = min_row.second;
@@ -117,12 +133,19 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
 
                     //Updating the board and sets
                     int num = *rows[i].begin(); //the last number to place in this row
+                    if (logging)
+                        log << "Filling (" << i << ' ' << j << ") with " << num << std::endl;
+
                     if (cols[j].find(num) == cols[j].end()) {
                         //The only solution is incorrect
+                        if (logging)
+                            log << num << " is already in column!" << std::endl;
                         return;
                     }
                     if (squares[sqInd].find(num) == squares[sqInd].end()) {
                         //The only solution is incorrect
+                        if (logging)
+                            log << num << " is already in square!" << std::endl;
                         return;
                     }
                     //Updating
@@ -150,6 +173,8 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
             if (min_square.first == 0) {
                 //Forgetting about full squares
                 squares_ord.erase(min_square);
+                if (logging)
+                    log << "Square " << min_square.second << " is full." << std::endl;
             }
             else {
                 int sqInd = min_square.second;
@@ -172,12 +197,19 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
 
                     //Updating the board and sets
                     int num = *squares[sqInd].begin(); //the last number to place in this column
+                    if (logging)
+                        log << "Filling (" << i << ' ' << j << ") with " << num << std::endl;
+
                     if (rows[i].find(num) == rows[i].end()) {
                         //The only solution is incorrect
+                        if (logging)
+                            log << num << " is already in row!" << std::endl;
                         return;
                     }
                     if (cols[j].find(num) == cols[j].end()) {
                         //The only solution is incorrect
+                        if (logging)
+                            log << num << " is already in column!" << std::endl;
                         return;
                     }
                     //Updating
@@ -205,6 +237,8 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
             if (min_col.first == 0) {
                 //Forgetting about full columns
                 cols_ord.erase(min_col);
+                if (logging)
+                    log << "Column " << min_col.second << " is full." << std::endl;
             }
             else {
                 int j = min_col.second;
@@ -220,12 +254,19 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
 
                     //Updating the board and sets
                     int num = *cols[j].begin(); //the last number to place in this column
+                    if (logging)
+                        log << "Filling (" << i << ' ' << j << ") with " << num << std::endl;
+
                     if (rows[i].find(num) == rows[i].end()) {
                         //The only solution is incorrect
+                        if (logging)
+                            log << num << " is already in row!" << std::endl;
                         return;
                     }
                     if (squares[sqInd].find(num) == squares[sqInd].end()) {
                         //The only solution is incorrect
+                        if (logging)
+                            log << num << " is already in square!" << std::endl;
                         return;
                     }
                     //Updating
@@ -250,6 +291,8 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
         if (uncertainRow && uncertainCol && uncertainSquare) {
             //Should iterate through possibilities after the loop
             uncertain = true;
+            if (logging)
+                log << "No more certain filling!" << std::endl;
         }
     }
 
@@ -262,13 +305,18 @@ void Solver::solve(const Board& b, std::vector<Board>& solutions) {
     if (!uncertain) {
         //We solved this board
         solutions.push_back(currBoard);
+        if (logging)
+            log << "Board solved:\n" << currBoard.toString() << std::endl;
     }
     else {
         //Taking uncertain position with the least amount of possible numbers available
         UncertainPosition pos = *uncertainPositions.begin();
         for (int num : pos.numbers) {
+            if (logging)
+                log << "Trying number " << num <<
+                " on the position (" << pos.i << ' ' << pos.j << ")" << std::endl;
             currBoard.set(num, pos.i, pos.j);
-            solve(currBoard, solutions);
+            solve(currBoard, solutions, log);
         }
     }
 }

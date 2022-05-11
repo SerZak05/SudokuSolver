@@ -87,19 +87,30 @@ int main(int argc, char* argv[]) {
     BoardDisplay startBoardDisplay(550, 10, 243, 243);
     BoardDisplay solutionBoardDisplay(550, 253, 243, 243);
 
-    //Additional parameters
+    bool logging = false;
+
+    //Processing command line parameters
     if (argc > 1) {
-        std::string param(argv[1]);
-        if (param == "--file" || param == "-f") { //File input
-            if (argc > 2) {
-                std::string fileName(argv[2]);
-                Board givenBoard = inputBoard(fileName);
-                //Setting button board accordingly
-                for (int i = 0; i < 9; ++i) {
-                    for (int j = 0; j < 9; ++j) {
-                        bb.setNumber(givenBoard.get(i, j), i, j);
+        for (int i = 1; i < argc; ++i) {
+            std::string param(argv[i]);
+            if (param == "--file" || param == "-f") { //File input
+                if (argc > i + 1) {
+                    std::string fileName(argv[i + 1]);
+                    Board givenBoard = inputBoard(fileName);
+                    //Setting button board accordingly
+                    for (int i = 0; i < 9; ++i) {
+                        for (int j = 0; j < 9; ++j) {
+                            bb.setNumber(givenBoard.get(i, j), i, j);
+                        }
                     }
+                    ++i;
                 }
+                else {
+                    std::cerr << "No input file provided!" << std::endl;
+                }
+            }
+            else if (param == "--log" || param == "-l") {
+                logging = true;
             }
         }
     }
@@ -115,21 +126,31 @@ int main(int argc, char* argv[]) {
                 running = false;
                 break;
             case SDL_KEYDOWN:
+                //Checking for SPACE
                 SDL_KeyboardEvent keyboardEvent = e.key;
                 if (e.key.keysym.sym == SDLK_SPACE) {
                     // Solving
                     startBoardDisplay.board = bb.getBoard();
+
                     Solver solver;
                     solver.setStartBoard(bb.getBoard());
-                    auto solutions = solver.solve();
-                    std::cout << "Done!" << std::endl;
+                    solver.logging = logging;
+                    auto solutions = solver.solve(log);
+
+                    //Dumping solutions into file
+                    std::ofstream dump("sudoku_solutions.out");
+                    for (const Board& solution : solutions) {
+                        dump << solution.toString();
+                        dump << "=========" << std::endl;
+                    }
+                    std::cout << "Done! Dumped solutions in file \"sudoku_solutions.out\"." << std::endl;
+
                     if (solutions.empty()) {
                         std::cout << "No solutions found" << std::endl;
                         solutionBoardDisplay.board = Board();
                     }
                     else {
                         solutionBoardDisplay.board = solutions.front();
-                        log << solutions.front().toString() << std::endl;
                     }
                 }
                 break;
@@ -137,6 +158,7 @@ int main(int argc, char* argv[]) {
                 bb.handleEvent(&e);
             }
         }
+        //Rendering
         SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
         SDL_RenderClear(renderer);
         bb.render(renderer);
