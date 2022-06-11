@@ -17,7 +17,7 @@ void Solver::setStartBoard(const Board& b) {
 
 std::vector<Board> Solver::solve(std::ostream& log) {
     if (logging)
-        log << "===Begging solving...===" << std::endl;
+        log << "===Beginning solving...===" << std::endl;
     std::vector<Board> res;
     solve(startBoard, res, log);
     if (logging) {
